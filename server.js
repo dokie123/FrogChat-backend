@@ -1,39 +1,26 @@
 const express = require("express");
-const http = require("http");
-const { Server } = require("socket.io");
 const cors = require("cors");
 
 const app = express();
-const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: "*", // Adjust for security in production
-    methods: ["GET", "POST"]
-  }
-});
-
 app.use(cors());
-app.use(express.json());
+app.use(express.json()); // Allow JSON requests
 
-// Test route
-app.get("/", (req, res) => {
-  res.send("Chat server is running!");
+// In-memory storage for messages (will be lost if server restarts)
+let messages = [];
+
+app.get("/messages", (req, res) => {
+    res.json(messages);
 });
 
-// Handle socket connections
-io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
-
-  socket.on("sendMessage", (messageData) => {
-    io.emit("receiveMessage", messageData); // Send message to all clients
-  });
-
-  socket.on("disconnect", () => {
-    console.log("User disconnected:", socket.id);
-  });
+app.post("/messages", (req, res) => {
+    const { text } = req.body;
+    if (!text) {
+        return res.status(400).json({ error: "Message text is required" });
+    }
+    messages.push(text);
+    res.json({ success: true });
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
