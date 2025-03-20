@@ -3,10 +3,9 @@ const cors = require("cors");
 
 const app = express();
 app.use(cors());
-app.use(express.json()); // Allow JSON requests
+app.use(express.json());
 
-// In-memory storage for messages (will be lost if server restarts)
-let messages = [];
+let messages = []; // Stores all chat messages
 
 app.get("/messages", (req, res) => {
     res.json(messages);
@@ -14,14 +13,11 @@ app.get("/messages", (req, res) => {
 
 app.post("/messages", (req, res) => {
     const { text } = req.body;
-    if (!text) {
-        return res.status(400).json({ error: "Message text is required" });
-    }
-    messages.push(text);
-    res.json({ success: true });
+    if (!text) return res.status(400).send("Message is required");
+
+    messages.push(text); // Store message
+    res.status(201).send("Message received");
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
