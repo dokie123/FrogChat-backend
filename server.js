@@ -10,9 +10,9 @@ const SECRET_KEY = process.env.JWT_SECRET || "your-secret-key";
 
 // **Hard-coded users**
 const users = [
-    { username: "Kleenex", password: "Dalekbridge" },
-    { username: "SillyGoose", password: "paswd" },
-    { username: "izzy", password: "letmein" }
+    { username: "admin", password: "password123" },
+    { username: "user1", password: "chatlover" },
+    { username: "guest", password: "letmein" }
 ];
 
 let messages = [];
