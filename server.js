@@ -12,7 +12,8 @@ const SECRET_KEY = process.env.JWT_SECRET || "Frogs";
 const users = [
     { username: "Kleenex", password: "dalekbridge" },
     { username: "SillyGoose", password: "froglover" },
-    { username: "Galax20", password: "silver" }
+    { username: "Galax20", password: "silver" },
+    { username: "Bluepinapple", password: "nErdlol" }
 ];
 
 let messages = [];
