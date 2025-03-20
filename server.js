@@ -13,7 +13,7 @@ const users = {
     "sillyGoose": "froglover",
     "dancinPinAple": "nErdlol",
     "kleenex": "dalekbridge",
-    "baSENORITA": "GetInTheWater",
+    "baSENORITA": "GITW",
     "violet": "password",
     "julianna": "password",
     "melita": "password"
