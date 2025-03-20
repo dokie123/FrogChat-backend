@@ -46,7 +46,9 @@ app.post("/send", (req, res) => {
 
 // **Get Messages**
 app.get("/messages", (req, res) => {
-    res.json(messages);
+    const since = parseInt(req.query.since) || 0; // Get last received timestamp from query
+    const newMessages = messages.filter(msg => msg.timestamp > since); // Send only new messages
+    res.json({ messages: newMessages, latestTimestamp: Date.now() });
 });
 
 // Start server
