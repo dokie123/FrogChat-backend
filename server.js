@@ -12,7 +12,7 @@ const SECRET_KEY = "Possum"; // Change this to a stronger secret in production
 const users = {
     "sillyGoose": "froglover",
     "dancinPinAple": "nErdlol",
-    "kleenex": "dalekbridge",
+    "Kleenex": "Dalekbridge",
     "baSENORITA": "GITW",
     "violet": "password",
     "julianna": "password",
