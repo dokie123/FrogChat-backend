@@ -6,13 +6,13 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const SECRET_KEY = process.env.JWT_SECRET || "your-secret-key";
+const SECRET_KEY = process.env.JWT_SECRET || "Frogs";
 
 // **Hard-coded users**
 const users = [
-    { username: "admin", password: "password123" },
-    { username: "user1", password: "chatlover" },
-    { username: "guest", password: "letmein" }
+    { username: "Kleenex", password: "Dalekbridge" },
+    { username: "SillyGoose", password: "Froglover" },
+    { username: "Galax20", password: "Silver" }
 ];
 
 let messages = [];
