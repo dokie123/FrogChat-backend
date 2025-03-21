@@ -14,25 +14,10 @@ const users = [
     { username: "Kleenex", password: "dalekbridge" },
     { username: "SillyGoose", password: "froglover" },
     { username: "Galax20", password: "silver" },
-    { username: "Bluepinapple", password: "nErdlol" },
-    { username: "Vivi", password: "kittysnuggler" },
-    { username: "BaSENORITA", password: "GITW" }
+    { username: "Bluepinapple", password: "nErdlol" }
 ];
 
 let messages = [];
-
-function authenticateToken(req, res, next) {
-    const token = req.headers.authorization?.split(" ")[1];
-    if (!token) return res.status(403).json({ message: "Unauthorized" });
-
-    try {
-        const decoded = jwt.verify(token, SECRET_KEY);
-        req.user = decoded.username;
-        next();
-    } catch {
-        res.status(403).json({ message: "Invalid token" });
-    }
-}
 
 // **Login Endpoint**
 app.post("/login", (req, res) => {
@@ -47,29 +32,32 @@ app.post("/login", (req, res) => {
     res.json({ token });
 });
 
-// **Send Message**
-app.post("/send", authenticateToken, (req, res) => {
-    const message = {
-        id: Date.now(),
-        sender: req.user,
-        text: req.body.message
-    };
-    messages.push(message);
-    res.json({ message: "Message sent", data: message });
+// **Send Message (Now includes timestamps)**
+app.post("/send", (req, res) => {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) return res.status(403).json({ message: "Unauthorized" });
+
+    try {
+        const { username } = jwt.verify(token, SECRET_KEY);
+        const newMessage = {
+            sender: username,
+            text: req.body.message,
+            timestamp: Date.now() // Add timestamp
+        };
+        messages.push(newMessage);
+        res.json({ message: "Message sent" });
+    } catch {
+        res.status(403).json({ message: "Invalid token" });
+    }
 });
 
-// **Delete Message (Admin only)**
-app.delete("/deleteMessage", authenticateToken, (req, res) => {
-    if (req.user !== "Admin") return res.status(403).json({ message: "Unauthorized" });
-
-    messages = messages.filter(msg => msg.id !== req.body.id);
-    res.json({ message: "Message deleted" });
-});
-
-// **Get Messages**
+// **Get Messages (Returns only new messages)**
 app.get("/messages", (req, res) => {
-    res.json({ messages });
+    const since = parseInt(req.query.since) || 0;
+    const newMessages = messages.filter(msg => msg.timestamp > since); // Now works correctly!
+    res.json({ messages: newMessages, latestTimestamp: Date.now() });
 });
 
+// **Start Server**
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
