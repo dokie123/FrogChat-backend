@@ -10,6 +10,7 @@ const SECRET_KEY = process.env.JWT_SECRET || "Frogs";
 
 // **Hard-coded users**
 const users = [
+    { username: "Admin", password: "Mehmet1453" },
     { username: "Kleenex", password: "dalekbridge" },
     { username: "SillyGoose", password: "froglover" },
     { username: "Galax20", password: "silver" },
