@@ -28,8 +28,8 @@ app.post("/login", (req, res) => {
         return res.status(401).json({ message: "Invalid username or password" });
     }
 
-    const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: "1h" });
-    res.json({ token });
+    const token = jwt.sign({ username, isAdmin: username === "Admin" }, SECRET_KEY, { expiresIn: "1h" });
+    res.json({ token, isAdmin: username === "Admin" });
 });
 
 // **Send Message (Now includes timestamps)**
@@ -40,6 +40,7 @@ app.post("/send", (req, res) => {
     try {
         const { username } = jwt.verify(token, SECRET_KEY);
         const newMessage = {
+            id: messages.length + 1,
             sender: username,
             text: req.body.message,
             timestamp: Date.now() // Add timestamp
@@ -54,8 +55,25 @@ app.post("/send", (req, res) => {
 // **Get Messages (Returns only new messages)**
 app.get("/messages", (req, res) => {
     const since = parseInt(req.query.since) || 0;
-    const newMessages = messages.filter(msg => msg.timestamp > since); // Now works correctly!
+    const newMessages = messages.filter(msg => msg.timestamp > since);
     res.json({ messages: newMessages, latestTimestamp: Date.now() });
+});
+
+// **Delete Message (Admin Only)**
+app.delete("/delete-message/:id", (req, res) => {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) return res.status(403).json({ message: "Unauthorized" });
+
+    try {
+        const { isAdmin } = jwt.verify(token, SECRET_KEY);
+        if (!isAdmin) return res.status(403).json({ message: "Forbidden" });
+
+        const messageId = parseInt(req.params.id);
+        messages = messages.filter(msg => msg.id !== messageId);
+        res.json({ message: "Message deleted" });
+    } catch {
+        res.status(403).json({ message: "Invalid token" });
+    }
 });
 
 // **Start Server**
