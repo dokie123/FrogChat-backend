@@ -8,7 +8,7 @@ app.use(cors());
 
 const SECRET_KEY = process.env.JWT_SECRET || "Frogs";
 
-// **Hard-coded users**
+// **Hardcoded Users**
 const users = [
     { username: "Admin", password: "Mehmet1453" },
     { username: "Kleenex", password: "dalekbridge" },
@@ -32,27 +32,32 @@ app.post("/login", (req, res) => {
     res.json({ token });
 });
 
-// **Send Message**
+// **Send Message Endpoint**
 app.post("/send", (req, res) => {
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(403).json({ message: "Unauthorized" });
 
     try {
         const { username } = jwt.verify(token, SECRET_KEY);
-        messages.push({ sender: username, text: req.body.message });
-        res.json({ message: "Message sent" });
+        const message = {
+            sender: username,
+            text: req.body.message,
+            timestamp: Date.now(),
+        };
+        messages.push(message);
+        res.json({ message: "Message sent", data: message });
     } catch {
         res.status(403).json({ message: "Invalid token" });
     }
 });
 
-// **Get Messages**
+// **Get Messages Endpoint**
 app.get("/messages", (req, res) => {
-    const since = parseInt(req.query.since) || 0; // Get last received timestamp from query
-    const newMessages = messages.filter(msg => msg.timestamp > since); // Send only new messages
+    const since = parseInt(req.query.since) || 0;
+    const newMessages = messages.filter(msg => msg.timestamp > since);
     res.json({ messages: newMessages, latestTimestamp: Date.now() });
 });
 
-// Start server
+// **Start Server**
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
