@@ -19,6 +19,19 @@ const users = [
 
 let messages = [];
 
+function authenticateToken(req, res, next) {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) return res.status(403).json({ message: "Unauthorized" });
+
+    try {
+        const decoded = jwt.verify(token, SECRET_KEY);
+        req.user = decoded.username;
+        next();
+    } catch {
+        res.status(403).json({ message: "Invalid token" });
+    }
+}
+
 // **Login Endpoint**
 app.post("/login", (req, res) => {
     const { username, password } = req.body;
@@ -32,32 +45,29 @@ app.post("/login", (req, res) => {
     res.json({ token });
 });
 
-// **Send Message Endpoint**
-app.post("/send", (req, res) => {
-    const token = req.headers.authorization?.split(" ")[1];
-    if (!token) return res.status(403).json({ message: "Unauthorized" });
-
-    try {
-        const { username } = jwt.verify(token, SECRET_KEY);
-        const message = {
-            sender: username,
-            text: req.body.message,
-            timestamp: Date.now(),
-        };
-        messages.push(message);
-        res.json({ message: "Message sent", data: message });
-    } catch {
-        res.status(403).json({ message: "Invalid token" });
-    }
+// **Send Message**
+app.post("/send", authenticateToken, (req, res) => {
+    const message = {
+        id: Date.now(),
+        sender: req.user,
+        text: req.body.message
+    };
+    messages.push(message);
+    res.json({ message: "Message sent", data: message });
 });
 
-// **Get Messages Endpoint**
+// **Delete Message (Admin only)**
+app.delete("/deleteMessage", authenticateToken, (req, res) => {
+    if (req.user !== "Admin") return res.status(403).json({ message: "Unauthorized" });
+
+    messages = messages.filter(msg => msg.id !== req.body.id);
+    res.json({ message: "Message deleted" });
+});
+
+// **Get Messages**
 app.get("/messages", (req, res) => {
-    const since = parseInt(req.query.since) || 0;
-    const newMessages = messages.filter(msg => msg.timestamp > since);
-    res.json({ messages: newMessages, latestTimestamp: Date.now() });
+    res.json({ messages });
 });
 
-// **Start Server**
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
