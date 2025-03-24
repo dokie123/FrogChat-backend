@@ -69,17 +69,19 @@ app.post("/delete", (req, res) => {
             return res.status(403).json({ message: "Only admins can delete messages" });
         }
 
-        const index = req.body.index;
-        if (index >= 0 && index < messages.length) {
+        const { id } = req.body;
+        const index = messages.findIndex(msg => msg.id === id);
+        if (index !== -1) {
             messages.splice(index, 1);
             return res.json({ message: "Message deleted" });
         }
 
-        res.status(400).json({ message: "Invalid message index" });
+        res.status(400).json({ message: "Message not found" });
     } catch {
         res.status(403).json({ message: "Invalid token" });
     }
 });
+
 
 // **Start Server**
 const PORT = process.env.PORT || 3000;
