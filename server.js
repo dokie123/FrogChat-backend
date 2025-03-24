@@ -28,6 +28,7 @@ app.post("/login", (req, res) => {
         return res.status(401).json({ message: "Invalid username or password" });
     }
 
+    // Generate token using JWT
     const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: "1h" });
     res.json({ token });
 });
@@ -40,11 +41,11 @@ app.post("/send", (req, res) => {
     try {
         const { username } = jwt.verify(token, SECRET_KEY);
         const timestamp = Date.now();
-        const id = `${timestamp}-${Math.random().toString(36).substr(2, 9)}`; // Unique ID
+        const id = `${timestamp}-${Math.random().toString(36).substr(2, 9)}`; // Unique ID for each message
 
         messages.push({ id, sender: username, text: req.body.message, timestamp });
         res.json({ message: "Message sent" });
-    } catch {
+    } catch (error) {
         res.status(403).json({ message: "Invalid token" });
     }
 });
@@ -57,7 +58,7 @@ app.get("/messages", (req, res) => {
     res.json({ messages: newMessages, latestTimestamp: Date.now() });
 });
 
-// **Delete Message (Admin Only)**
+// **Delete Message Endpoint (Admin Only)**
 app.post("/delete", (req, res) => {
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(403).json({ message: "Unauthorized" });
@@ -69,14 +70,15 @@ app.post("/delete", (req, res) => {
         }
 
         const { id } = req.body;
-        const index = messages.findIndex(msg => msg.id === id);  // Find the message by id
+        const index = messages.findIndex(msg => msg.id === id);
+
         if (index !== -1) {
-            messages.splice(index, 1);  // Remove the message from the array
+            messages.splice(index, 1); // Remove message from the array
             return res.json({ message: "Message deleted" });
         }
 
         res.status(400).json({ message: "Message not found" });
-    } catch {
+    } catch (error) {
         res.status(403).json({ message: "Invalid token" });
     }
 });
