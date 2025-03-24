@@ -49,8 +49,7 @@ app.post("/send", (req, res) => {
     }
 });
 
-
-// **Fetch Messages Endpoint (with timestamps)**
+// **Fetch Messages Endpoint**
 app.get("/messages", (req, res) => {
     const since = parseInt(req.query.since) || 0;
     const newMessages = messages.filter(msg => msg.timestamp > since);
@@ -81,7 +80,6 @@ app.post("/delete", (req, res) => {
         res.status(403).json({ message: "Invalid token" });
     }
 });
-
 
 // **Start Server**
 const PORT = process.env.PORT || 3000;
