@@ -69,9 +69,9 @@ app.post("/delete", (req, res) => {
         }
 
         const { id } = req.body;
-        const index = messages.findIndex(msg => msg.id === id);
+        const index = messages.findIndex(msg => msg.id === id);  // Find the message by id
         if (index !== -1) {
-            messages.splice(index, 1);
+            messages.splice(index, 1);  // Remove the message from the array
             return res.json({ message: "Message deleted" });
         }
 
