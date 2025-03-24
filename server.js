@@ -40,13 +40,15 @@ app.post("/send", (req, res) => {
     try {
         const { username } = jwt.verify(token, SECRET_KEY);
         const timestamp = Date.now();
+        const id = `${timestamp}-${Math.random().toString(36).substr(2, 9)}`; // Unique ID
 
-        messages.push({ sender: username, text: req.body.message, timestamp });
+        messages.push({ id, sender: username, text: req.body.message, timestamp });
         res.json({ message: "Message sent" });
     } catch {
         res.status(403).json({ message: "Invalid token" });
     }
 });
+
 
 // **Fetch Messages Endpoint (with timestamps)**
 app.get("/messages", (req, res) => {
