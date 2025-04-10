@@ -56,8 +56,14 @@ app.get("/messages", (req, res) => {
     const since = parseInt(req.query.since) || 0;
     const newMessages = messages.filter(msg => msg.timestamp > since);
 
-    res.json({ messages: newMessages, latestTimestamp: Date.now() });
+    // Find the newest timestamp among the messages we're sending back
+    const latestTimestamp = newMessages.length
+        ? Math.max(...newMessages.map(m => m.timestamp))
+        : since; // fallback to "since" if nothing new
+
+    res.json({ messages: newMessages, latestTimestamp });
 });
+
 
 // **Delete Message (Admin Only)**
 app.post("/delete", (req, res) => {
