@@ -54,7 +54,7 @@ app.post("/send", (req, res) => {
 // **Fetch Messages Endpoint**
 app.get("/messages", (req, res) => {
     const since = parseInt(req.query.since) || 0;
-    const newMessages = messages.filter(msg => msg.timestamp > since);
+    const newMessages = messages.filter(msg => msg.timestamp >= since);
 
     // Find the newest timestamp among the messages we're sending back
     const latestTimestamp = newMessages.length
