@@ -15,7 +15,8 @@ const users = [
     { username: "SillyGoose", password: "froglover" },
     { username: "Galax20", password: "silver" },
     { username: "Bluepinapple", password: "nErdlol" },
-    { username: "BASENORITA", password: "GITW" }
+    { username: "BASENORITA", password: "GITW" },
+    { username: "Vivi", password: "kittysnuggler" }
 ];
 
 let messages = [];
